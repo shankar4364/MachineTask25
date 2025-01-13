@@ -1,0 +1,242 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Task2</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+
+    <script>
+
+        $(document).ready(function () {
+
+            // Fetch all societies
+            $("#GetAll").click(function () {
+                $.ajax({
+                    type: "GET",
+                    url: "http://localhost:60258/api/WebApi/GetAllSociety",
+                    contentType: "application/json;charset=utf-8",
+                    dataType: "JSON",
+
+                    success: function (result) {
+                        alert("Data retrieved successfully!");
+
+                        // Clear table before appending new data
+                        $("#tblshow tbody").empty();
+
+                        var str = "";
+                        $.each(result, function () {
+                            str += "<tr>" +
+                                "<td>" + this["Society_id"] + "</td>" +
+                                "<td>" + this["Society_name"] + "</td>" +
+                                "<td>" + this["Location"] + "</td>" +
+                                "<td>" + this["City"] + "</td>" +
+                                "<td>" + this["Owner"] + "</td>" +
+                                "<td>" + this["Type"] + "</td>" +
+                                "<td>" + this["ContactNo"] + "</td>" +
+                                "<td>" + this["Eyear"] + "</td>" + "</tr>";
+                        });
+                        $("#tblshow tbody").append(str);
+                    },
+
+                    failure: function (error) {
+                        alert("Error: " + error.responseText);
+                    }
+                });
+            });
+
+            // Fetch society by id
+            $("#GetById").click(function () {
+                var societyId = $("#txt2").val();
+                if (societyId) {
+                    $.ajax({
+                        type: "GET",
+                        url: "http://localhost:60258/api/WebApi/GetBySocietyId?id=" + societyId,
+                        contentType: "application/json;charset=utf-8",
+                        dataType: "JSON",
+
+                        success: function (result) {
+                            alert("Society retrieved successfully!");
+
+                            // Clear table before appending new data
+                            $("#tblshow tbody").empty();
+
+                            var str = "<tr>" +
+                                "<td>" + result["Society_id"] + "</td>" +
+                                "<td>" + result["Society_name"] + "</td>" +
+                                "<td>" + result["Location"] + "</td>" +
+                                "<td>" + result["City"] + "</td>" +
+                                "<td>" + result["Owner"] + "</td>" +
+                                "<td>" + result["Type"] + "</td>" +
+                                "<td>" + result["ContactNo"] + "</td>" +
+                                "<td>" + result["Eyear"] + "</td>" + "</tr>";
+
+                            $("#tblshow tbody").append(str);
+                        },
+                        failure: function (error) {
+                            alert("Error: " + error.responseText);
+                        }
+                    });
+                } else {
+                    alert("Please enter a valid Society ID.");
+                }
+            });
+
+            // Save new society data
+            $("#SaveData").click(function () {
+                var savedata = {
+                    Society_name: $("#txt3").val(),
+                    Location: $("#txt4").val(),
+                    City: $("#txt5").val(),
+                    Owner: $("#txt6").val(),
+                    Type: $("#txt7").val(),
+                    ContactNo: $("#txt8").val(),
+                    Eyear: $("#txt9").val(),
+                };
+
+                $.ajax({
+                    type: "POST",
+                    url: "http://localhost:60258/api/WebApi/SaveSociety",
+                    contentType: "application/json;charset=utf-8",
+                    dataType: "JSON",
+                    data: JSON.stringify(savedata),
+
+                    success: function (result) {
+                        alert("Data successfully saved: " + result);
+                    },
+                    failure: function (error) {
+                        alert("Error occurred: " + error.responseText);
+                    }
+                });
+            });
+
+            // Update society data
+            $("#UpdateData").click(function () {
+                var updatedata = {
+                    Society_id: $("#txt2").val(),
+                    Society_name: $("#txt3").val(),
+                    Location: $("#txt4").val(),
+                    City: $("#txt5").val(),
+                    Owner: $("#txt6").val(),
+                    Type: $("#txt7").val(),
+                    ContactNo: $("#txt8").val(),
+                    Eyear: $("#txt9").val(),
+                };
+
+                $.ajax({
+                    type: "PUT",
+                    url: "http://localhost:60258/api/WebApi/UpdateSociety?id=" + $("#txt2").val(),
+                    contentType: "application/json;charset=utf-8",
+                    dataType: "JSON",
+                    data: JSON.stringify(updatedata),
+
+                    success: function (result) {
+                        alert("Data successfully updated: " + result);
+                    },
+                    failure: function (error) {
+                        alert("Error occurred: " + error.responseText);
+                    }
+                });
+            });
+
+            // Delete society data
+            $("#DeleteData").click(function () {
+                $.ajax({
+                    type: "DELETE",
+                    url: "http://localhost:60258/api/WebApi/DeleteSociety?id=" + $("#txt2").val(),
+                    contentType: "application/json;charset=utf-8",
+                    dataType: "JSON",
+
+                    success: function (result) {
+                        alert("Data successfully deleted: " + result);
+                    },
+                    failure: function (error) {
+                        alert("Error occurred: " + error.responseText);
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <div>
+        
+        <div class="card" style="width: 60rem; margin: 20px auto; padding: 20px;">
+            <div class="card-body">
+                <input type="button" value="GetAll" id="GetAll" class="btn btn-primary">
+                <input type="button" value="GetById" id="GetById" class="btn btn-success">
+                <input type="button" id="SaveData" value="SaveData" class="btn btn-warning">
+                <input type="button" id="UpdateData" value="UpdateData" class="btn btn-info">
+                <input type="button" id="DeleteData" value="DeleteData" class="btn btn-danger">
+                <br><br><br><br>
+                <form>
+                    <div class="mb-3">
+                        <label for="txt2" class="form-label">Society Id</label>
+                        <input type="text" id="txt2" class="form-control" placeholder="enter id">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="txt3" class="form-label">Society Name</label>
+                        <input type="text" id="txt3" class="form-control" placeholder="enter society name">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="txt4" class="form-label">Society Location</label>
+                        <input type="text" id="txt4" class="form-control" placeholder="enter location name">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="txt5" class="form-label">Society City</label>
+                        <input type="text" id="txt5" class="form-control" placeholder="enter city">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="txt6" class="form-label">Society Owner</label>
+                        <input type="text" id="txt6" class="form-control" placeholder="enter owner">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="txt7" class="form-label">Society Type</label>
+                        <input type="text" id="txt7" class="form-control" placeholder="enter type">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="txt8" class="form-label">Society contact no</label>
+                        <input type="text" id="txt8" class="form-control" placeholder="enter contact no">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="txt9" class="form-label">Society year</label>
+                        <input type="text" id="txt9" class="form-control" placeholder="enter year">
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+
+
+        <table id="tblshow" border="2">
+            <thead>
+                <tr>
+                    <td>Society_id</td>
+                    <td>Society_name</td>
+                    <td>Location</td>
+                    <td>City</td>
+                    <td>Owner</td>
+                    <td>Type</td>
+                    <td>ContactNo</td>
+                    <td>Eyear</td>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</body>
+</html>
